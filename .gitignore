@@ -1,0 +1,19 @@
+# Chrome Extension — build artifacts
+*.crx
+*.pem
+*.zip
+
+# Claude Code local settings (contains local machine paths)
+.claude/
+
+# Dependencies / build output
+node_modules/
+dist/
+build/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
