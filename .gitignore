@@ -1,3 +1,6 @@
+# Full implementation files — local only, never committed
+*.full.js
+
 # Chrome Extension — build artifacts
 *.crx
 *.pem
