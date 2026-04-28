@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Lul Verifica",
   "version": "2.0.0",
-  "description": "Verifica mudanças suspeitas de cliente em tweets — detecta hacks de conta.",
+  "description": "Detects suspicious posting-client changes on tweets — flags potential account compromises.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

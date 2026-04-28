@@ -1,13 +1,13 @@
 /**
- * content.js — orquestrador Lul Verifica
- * Mostra o cliente de QUALQUER tweet assim que ele aparecer na tela.
- * Histórico é usado para análise de risco quando disponível,
- * mas o card é exibido mesmo sem histórico.
+ * content.js — main orchestrator
+ * Shows the posting client for any tweet as soon as it appears on screen.
+ * History is used for risk analysis when available,
+ * but the card renders even without history.
  */
 (function () {
   'use strict';
 
-  // tweetsByUser: Map<userId, Tweet[]>  — sem limite de tamanho
+  // tweetsByUser: Map<userId, Tweet[]>
   const tweetsByUser  = new Map();
   const pendingByTwId = new Map();
 
@@ -22,8 +22,8 @@
     for (const t of tweets) {
       if (!t.id || !t.user_id) continue;
 
-      // Aceita qualquer tweet — com ou sem source
-      // (se vier sem source, o card vai mostrar "Desconhecido" mas ainda aparece)
+      // Accepts any tweet — with or without source
+      // (if source is missing, the card shows "Unknown" but still renders)
       if (!tweetsByUser.has(t.user_id)) tweetsByUser.set(t.user_id, []);
       const list = tweetsByUser.get(t.user_id);
       if (!list.find(x => x.id === t.id)) list.push(t);
@@ -33,7 +33,7 @@
   });
 
   function analyze(freshTweets) {
-    // Re-analisa apenas os tweets que acabaram de chegar (mais eficiente)
+    // Re-analyse only the freshly received tweets for efficiency
     const toProcess = freshTweets
       ? freshTweets.filter(t => t.id && t.user_id)
       : [...tweetsByUser.values()].flat();
@@ -44,10 +44,9 @@
 
       const analysis = XClientAnalyzer.detectClientShift([tw, ...history]);
 
-      // Mostra card para QUALQUER tweet que tenha source identificável
-      // (mesmo que riskScore === 0 e sem histórico)
+      // Show card for any tweet with an identifiable source,
+      // even if riskScore === 0 and there is no history.
       if (!tw.source && analysis.riskScore === 0 && analysis.totalAnalyzed === 0) {
-        // Sem source e sem histórico = nada útil para mostrar
         continue;
       }
 
@@ -84,12 +83,12 @@
   const obs = new MutationObserver((muts) => {
     if (!muts.some(m => m.addedNodes.length)) return;
 
-    // Re-injeta cards pendentes que apareceram no DOM
+    // Re-inject pending cards that have appeared in the DOM
     for (const [id, analysis] of pendingByTwId.entries()) {
       if (!document.getElementById(`lulv-${id}`)) tryInject(id, analysis);
     }
 
-    // Detecta artigos novos e injeta se já temos análise
+    // Detect new articles and inject if analysis is already available
     document.querySelectorAll('article[data-testid="tweet"]:not([data-lulv])').forEach(art => {
       art.setAttribute('data-lulv', '1');
       const id = getTweetId(art);
@@ -103,7 +102,7 @@
     const target = document.body || document.documentElement;
     if (!target) { document.addEventListener('DOMContentLoaded', start, {once:true}); return; }
     obs.observe(target, { childList:true, subtree:true });
-    console.log('[LulVerifica] Ativo ✓ — Ctrl+Shift+D para debug');
+    console.log('[XClientDetector] Active ✓ — Ctrl+Shift+D for debug panel');
   }
   start();
 })();

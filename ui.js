@@ -1,5 +1,5 @@
 /**
- * ui.js — renderização do card "Lul Verifica"
+ * ui.js — card rendering and DOM injection
  */
 const XClientUI = (() => {
   'use strict';
@@ -14,14 +14,14 @@ const XClientUI = (() => {
   }
 
   function riskLabel(s) {
-    if (s >= 70) return '🚨 Alto Risco — Mudança suspeita!';
-    if (s >= 40) return '⚠️ Risco Moderado';
-    if (s >= 20) return '🔔 Risco Baixo';
+    if (s >= 70) return '🚨 High Risk — Suspicious change!';
+    if (s >= 40) return '⚠️ Moderate Risk';
+    if (s >= 20) return '🔔 Low Risk';
     return '✅ Normal';
   }
 
   function freqBars(freq, total) {
-    if (!freq || total === 0) return '<span style="color:#536471;font-size:11px">Sem histórico ainda — abra mais tweets deste perfil.</span>';
+    if (!freq || total === 0) return '<span style="color:#536471;font-size:11px">No history yet — open more tweets from this profile.</span>';
     const { CLIENT_LABELS, CLIENT_ICONS } = XClientAnalyzer;
     return Object.entries(freq)
       .sort((a,b) => b[1]-a[1])
@@ -58,18 +58,18 @@ const XClientUI = (() => {
 
     card.innerHTML = `
       <div class="lulv-header" style="cursor:pointer">
-        <span class="lulv-title">🔍 Lul Verifica</span>
-        <button class="lulv-toggle" title="Expandir/Recolher">▸</button>
+        <span class="lulv-title">🔍 X Client Detector</span>
+        <button class="lulv-toggle" title="Expand/Collapse">▸</button>
       </div>
       <div class="lulv-body" style="display:none">
         <div class="lulv-row">
           <div class="lulv-ib">
-            <span class="lulv-il">Cliente atual</span>
+            <span class="lulv-il">Current client</span>
             <span class="lulv-iv">${icon} ${clientLabel}</span>
           </div>
           ${!noHistory ? `
           <div class="lulv-ib">
-            <span class="lulv-il">Histórico dominante</span>
+            <span class="lulv-il">Dominant history</span>
             <span class="lulv-iv">${dominantIcon || '❓'} ${dominantLabel}</span>
           </div>
           <div class="lulv-ib">
@@ -79,7 +79,7 @@ const XClientUI = (() => {
           ` : `
           <div class="lulv-ib">
             <span class="lulv-il">Risk Score</span>
-            <span class="lulv-iv lulv-score" style="color:#536471">— <span style="font-size:11px;font-weight:400">sem histórico</span></span>
+            <span class="lulv-iv lulv-score" style="color:#536471">— <span style="font-size:11px;font-weight:400">no history</span></span>
           </div>
           `}
         </div>
@@ -92,12 +92,12 @@ const XClientUI = (() => {
         ${reason ? `<div class="lulv-reason">${reason}</div>` : ''}
         ` : `
         <div class="lulv-rlabel" style="color:#536471;font-size:11px">
-          ⏳ Histórico insuficiente — navegue pelo perfil para acumular dados.
+          ⏳ Not enough history — browse the profile to accumulate data.
         </div>
         `}
 
         <div class="lulv-stitle">
-          Distribuição histórica ${totalAnalyzed > 0 ? `(${totalAnalyzed} tweets)` : ''}
+          Historical distribution ${totalAnalyzed > 0 ? `(${totalAnalyzed} tweets)` : ''}
         </div>
         <div class="lulv-freq">${bars}</div>
       </div>
@@ -118,7 +118,7 @@ const XClientUI = (() => {
     if (parent) parent.insertBefore(card, next);
   }
 
-  // ── Painel de debug (Ctrl+Shift+D) ─────────────────────────────────────────
+  // ── Debug panel (Ctrl+Shift+D) ────────────────────────────────────────────
   const debugLog = [];
 
   function addDebug(tweets) {
@@ -136,7 +136,7 @@ const XClientUI = (() => {
     const rows = debugLog.slice(0, 100).map(t => {
       const src = t.source
         ? `<span style="color:#00ba7c">${t.source.replace(/<[^>]+>/g,'')}</span>`
-        : `<span style="color:#f4212e">vazio</span>`;
+        : `<span style="color:#f4212e">empty</span>`;
       const ep = t.endpoint === 'TweetDetail'
         ? `<span style="color:#1d9bf0">TweetDetail${t.is_focal?' ★':''}</span>`
         : `<span style="color:#536471">UserTweets</span>`;
@@ -149,24 +149,24 @@ const XClientUI = (() => {
 
     p.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#1e2128;border-bottom:1px solid #2f3336">
-        <span style="font-weight:700;color:#1d9bf0;font-size:13px">🔍 Lul Verifica — Debug (${debugLog.length} tweets capturados)</span>
+        <span style="font-weight:700;color:#1d9bf0;font-size:13px">🔍 X Client Detector — Debug (${debugLog.length} tweets captured)</span>
         <button onclick="document.getElementById('lulv-dbg').style.display='none'"
           style="background:none;border:none;color:#536471;cursor:pointer;font-size:18px;line-height:1">✕</button>
       </div>
       <div style="padding:6px 14px;font-size:11px;color:#536471;border-bottom:1px solid #2f3336">
-        💡 <b style="color:#e7e9ea">Dica:</b> Abra tweets individuais para capturar source via TweetDetail.
-        Feche com <kbd style="background:#2f3336;padding:1px 4px;border-radius:3px">Ctrl+Shift+D</kbd>
+        💡 <b style="color:#e7e9ea">Tip:</b> Open individual tweets to capture source via TweetDetail.
+        Close with <kbd style="background:#2f3336;padding:1px 4px;border-radius:3px">Ctrl+Shift+D</kbd>
       </div>
       <div style="overflow-y:auto;max-height:340px">
         <table style="width:100%;border-collapse:collapse">
           <thead style="background:#1a1c1f;position:sticky;top:0">
             <tr>
-              <th style="padding:5px 8px;text-align:left;color:#536471;font-size:11px;font-weight:600">Autor</th>
+              <th style="padding:5px 8px;text-align:left;color:#536471;font-size:11px;font-weight:600">Author</th>
               <th style="padding:5px 8px;text-align:left;color:#536471;font-size:11px;font-weight:600">Source</th>
               <th style="padding:5px 8px;text-align:left;color:#536471;font-size:11px;font-weight:600">Endpoint</th>
             </tr>
           </thead>
-          <tbody>${rows || '<tr><td colspan="3" style="padding:16px;color:#536471;text-align:center">Nenhum tweet capturado ainda.</td></tr>'}</tbody>
+          <tbody>${rows || '<tr><td colspan="3" style="padding:16px;color:#536471;text-align:center">No tweets captured yet.</td></tr>'}</tbody>
         </table>
       </div>
     `;

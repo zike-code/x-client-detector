@@ -1,6 +1,6 @@
 /**
  * interceptor.js — ISOLATED world
- * Recebe postMessage do page_world.js e repassa via CustomEvent.
+ * Receives postMessage from page_world.js and forwards it as a CustomEvent.
  */
 (function () {
   'use strict';
